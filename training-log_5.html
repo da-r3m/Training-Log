@@ -1,0 +1,1025 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#1D2119;
+    --panel:#242920;
+    --panel-2:#2C3226;
+    --ink:#ECE7D6;
+    --ink-dim:#9BA28C;
+    --ink-faint:#6D7563;
+    --brass:#C9A24B;
+    --brass-dim:#8E7433;
+    --rule:#3A4032;
+    --meal:#C98B4A;
+    --meal-dim:#8A6236;
+    --workout:#6FA79E;
+    --workout-dim:#4C726B;
+  }
+  .app-wrap{
+    font-family:'Inter',sans-serif;
+    background:var(--ground);
+    color:var(--ink);
+    border-radius:16px;
+    max-width:640px;
+    margin:0 auto;
+    overflow:visible;
+    position:relative;
+    box-shadow:0 1px 0 rgba(255,255,255,0.03) inset, 0 12px 30px rgba(0,0,0,0.28);
+  }
+  .spine{
+    position:absolute;
+    left:0; top:16px; bottom:16px;
+    width:3px;
+    background:linear-gradient(180deg, var(--brass-dim), var(--rule) 40%, var(--rule) 60%, var(--brass-dim));
+    border-radius:2px;
+    opacity:0.5;
+  }
+  .app-inner{
+    border-radius:16px;
+    border:1px solid var(--rule);
+    overflow:hidden;
+    background:var(--ground);
+  }
+  .app-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    padding:26px 28px 20px 32px;
+  }
+  .app-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:24px;
+    letter-spacing:0.2px;
+    color:var(--ink);
+  }
+  .app-sub{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-faint);
+    margin-top:5px;
+    letter-spacing:0.3px;
+  }
+  .seal{
+    width:52px; height:52px;
+    border-radius:50%;
+    border:1.5px solid var(--brass-dim);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    background:var(--panel);
+  }
+  .seal .num{
+    font-family:'Fraunces',serif;
+    font-size:16px;
+    font-weight:600;
+    color:var(--brass);
+  }
+
+  .tab-row{
+    display:flex;
+    padding:0 32px;
+    gap:6px;
+    position:relative;
+    top:1px;
+  }
+  .tab-flag{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:14px;
+    font-weight:500;
+    padding:9px 20px 10px;
+    border-radius:10px 10px 0 0;
+    cursor:pointer;
+    color:var(--ink-faint);
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-bottom:none;
+    transition:color 0.15s ease, background 0.15s ease;
+  }
+  .tab-flag[data-tab="meals"].active{color:var(--meal);background:var(--panel-2);}
+  .tab-flag[data-tab="workouts"].active{color:var(--workout);background:var(--panel-2);}
+  .tab-flag:not(.active):hover{color:var(--ink-dim);}
+
+  .body-surface{
+    background:var(--panel-2);
+    border-top:1px solid var(--rule);
+    padding:24px 32px 28px;
+  }
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadeIn 0.25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+
+  .figure-row{
+    display:flex;
+    padding:2px 0 22px;
+    margin-bottom:20px;
+    border-bottom:1px solid var(--rule);
+  }
+  .figure{flex:1;padding-right:20px;}
+  .figure + .figure{border-left:1px solid var(--rule);padding-left:20px;}
+  .figure .l{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.6px;}
+  .figure .v{font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin-top:3px;}
+  .figure.meal .v{color:var(--meal);}
+  .figure.workout .v{color:var(--workout);}
+
+  .search-box{
+    border:1px solid var(--rule);
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:18px;
+    background:var(--panel);
+  }
+  .search-row{display:flex;gap:10px;}
+  .search-row input{
+    flex:1;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    background:transparent;
+    border:none;
+    border-bottom:1.5px solid var(--rule);
+    color:var(--ink);
+    padding:8px 2px;
+  }
+  .search-row input::placeholder{color:var(--ink-faint);}
+  .search-row input:focus{outline:none;border-bottom-color:var(--meal);}
+  .search-results{margin-top:14px;}
+  .result-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    border-bottom:1px solid var(--rule);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    padding:10px 2px;
+    cursor:pointer;
+  }
+  .result-item:last-child{border-bottom:none;}
+  .result-item:hover{color:var(--meal);}
+  .result-item .r-brand{color:var(--ink-faint);font-size:11.5px;}
+  .result-item .r-kcal{font-family:'IBM Plex Mono',monospace;color:var(--ink-dim);font-size:11.5px;white-space:nowrap;padding-left:12px;}
+  .qty-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .qty-row label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);}
+  .qty-row input{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+    color:var(--ink);
+    background:transparent;
+    border:none;
+    border-bottom:1.5px solid var(--rule);
+    padding:2px 2px 4px;
+    width:70px;
+  }
+  .qty-row input:focus{outline:none;border-bottom-color:var(--meal);}
+  .add-custom{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--rule);
+  }
+  .add-custom .hint{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-faint);margin-bottom:8px;}
+  .add-custom-row{display:flex;gap:10px;align-items:center;}
+  .add-custom-row input{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--rule);
+    color:var(--ink);
+    padding:6px 2px;
+    width:110px;
+  }
+  .add-custom-row input:focus{outline:none;border-bottom-color:var(--meal);}
+  .add-custom-row label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);white-space:nowrap;}
+  .capture-btn, .primary-btn{
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    font-size:13px;
+    background:var(--meal);
+    color:#20180D;
+    border:none;
+    border-radius:8px;
+    padding:10px 20px;
+    cursor:pointer;
+    transition:opacity 0.15s ease;
+  }
+  #panel-workouts .primary-btn{background:var(--workout);color:#0F211D;}
+  .capture-btn:hover, .primary-btn:hover{opacity:0.88;}
+  .ghost-btn{
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    font-size:12.5px;
+    background:none;
+    border:1px solid var(--rule);
+    color:var(--ink-dim);
+    border-radius:8px;
+    padding:9px 16px;
+    cursor:pointer;
+    transition:border-color 0.15s ease, color 0.15s ease;
+  }
+  .ghost-btn:hover{border-color:var(--ink-dim);color:var(--ink);}
+  .analyzing{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--meal);
+    margin-top:10px;
+  }
+  .analyze-error{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:#D97757;
+    margin-top:10px;
+    line-height:1.5;
+    text-align:left;
+    background:var(--panel-2);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:10px 12px;
+  }
+  .analyze-error .retry-btn{
+    display:inline-block;
+    margin-top:8px;
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    color:var(--meal);
+    background:none;
+    border:1px solid var(--meal-dim);
+    border-radius:6px;
+    padding:5px 12px;
+    cursor:pointer;
+  }
+  .analyze-error .retry-btn:hover{background:var(--meal-dim);color:var(--ink);}
+  .estimate-card{
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:12px;
+    padding:16px 18px;
+    margin-bottom:18px;
+  }
+  .estimate-items{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-dim);margin-bottom:12px;line-height:1.6;}
+  .cal-edit-row{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;}
+  .cal-edit-row input{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    font-weight:600;
+    color:var(--meal);
+    background:transparent;
+    border:none;
+    border-bottom:1.5px solid var(--rule);
+    padding:2px 2px 4px;
+    width:100px;
+  }
+  .cal-edit-row input:focus{outline:none;border-bottom-color:var(--meal);}
+  .cal-edit-row span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);}
+
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    font-weight:500;
+    text-transform:uppercase;
+    letter-spacing:0.8px;
+    color:var(--ink-faint);
+    margin:24px 0 12px;
+  }
+
+  .entry-list{margin-top:2px;}
+  .entry-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 0;
+    border-bottom:1px solid var(--rule);
+    font-size:13px;
+  }
+  .entry-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .entry-item.meal .dot{background:var(--meal);}
+  .entry-item.workout .dot{background:var(--workout);}
+  .entry-item .desc{color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Inter',sans-serif;}
+  .entry-item .meta{font-family:'IBM Plex Mono',monospace;color:var(--ink-faint);font-size:11.5px;}
+  .entry-item .cal{font-family:'IBM Plex Mono',monospace;color:var(--meal);font-weight:500;white-space:nowrap;}
+  .del{
+    background:none;border:none;color:var(--ink-faint);cursor:pointer;
+    font-size:15px;line-height:1;width:22px;height:22px;border-radius:50%;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .del:hover{background:var(--rule);color:var(--ink);}
+  .empty-msg{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-faint);
+    padding:26px 0;
+    text-align:center;
+    border:1px dashed var(--rule);
+    border-radius:10px;
+    margin-top:4px;
+  }
+
+  .w-form{
+    display:grid;
+    grid-template-columns:1fr 64px 64px 76px;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .w-form input{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    border:none;
+    border-bottom:1px solid var(--rule);
+    background:transparent;
+    color:var(--ink);
+    padding:8px 2px;
+    width:100%;
+    box-sizing:border-box;
+  }
+  .w-form input::placeholder{color:var(--ink-faint);}
+  .w-form input:focus{outline:none;border-bottom-color:var(--workout);}
+
+  .routine-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .routine-chip{
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    color:var(--ink-dim);
+    border-radius:16px;
+    padding:7px 14px;
+    cursor:pointer;
+    transition:border-color 0.15s ease, color 0.15s ease;
+  }
+  .routine-chip:hover{border-color:var(--workout);color:var(--workout);}
+  .routine-chip.add-new{color:var(--brass);border-color:var(--brass-dim);border-style:dashed;}
+
+  .new-routine-form{
+    display:none;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:18px;
+  }
+  .new-routine-form.show{display:block;animation:fadeIn 0.2s ease;}
+  .new-routine-form input{
+    width:100%;box-sizing:border-box;font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    border:none;border-bottom:1px solid var(--rule);background:transparent;color:var(--ink);padding:8px 2px;margin-bottom:12px;
+  }
+  .new-routine-form input:focus{outline:none;border-bottom-color:var(--workout);}
+
+  .coach-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--panel);
+    border:1px solid var(--workout-dim);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:20px;
+  }
+  .coach-avatar{
+    width:38px;height:38px;
+    border-radius:50%;
+    background:var(--workout-dim);
+    color:var(--ink);
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .coach-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:var(--workout);
+    margin-bottom:2px;
+  }
+  .coach-msg{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    color:var(--ink);
+    line-height:1.4;
+  }
+  .exercise-suggestions{
+    margin:-6px 0 14px;
+  }
+  .exercise-suggestions:empty{margin:0;}
+  .exercise-suggestions .sugg-item{
+    display:inline-block;
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    color:var(--ink-dim);
+    border-radius:14px;
+    padding:5px 12px;
+    margin:0 6px 6px 0;
+    cursor:pointer;
+    transition:border-color 0.15s ease, color 0.15s ease;
+  }
+  .exercise-suggestions .sugg-item:hover{border-color:var(--workout);color:var(--workout);}
+
+  .status-line{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);min-height:16px;margin-top:8px;}
+
+  @media (max-width:480px){
+    .app-head{padding:22px 20px 16px 24px;}
+    .tab-row{padding:0 20px;}
+    .body-surface{padding:20px 20px 24px;}
+    .w-form{grid-template-columns:1fr 1fr;}
+    .figure-row{flex-wrap:wrap;}
+  }
+</style>
+
+<div class="app-wrap">
+  <div class="spine"></div>
+  <div class="app-inner">
+    <div class="app-head">
+      <div>
+        <div class="app-title">Field log</div>
+        <div class="app-sub" id="today-label"></div>
+      </div>
+      <div class="seal"><div class="num" id="seal-day"></div></div>
+    </div>
+
+    <div class="tab-row">
+      <div class="tab-flag active" data-tab="meals">Meals</div>
+      <div class="tab-flag" data-tab="workouts">Workouts</div>
+    </div>
+
+    <div class="body-surface">
+      <div class="panel active" id="panel-meals">
+        <div class="figure-row">
+          <div class="figure meal"><div class="l">Calories today</div><div class="v" id="cal-total">0</div></div>
+          <div class="figure meal"><div class="l">Meals logged</div><div class="v" id="meal-count">0</div></div>
+        </div>
+
+        <div class="search-box" id="search-box">
+          <div class="search-row">
+            <input type="text" id="food-search-input" placeholder="Search a food — e.g. banana, chicken breast">
+            <button class="primary-btn" id="food-search-btn">Search</button>
+          </div>
+          <div class="analyze-error" id="analyze-error" style="display:none;"></div>
+          <div class="search-results" id="search-results"></div>
+        </div>
+
+        <div class="estimate-card" id="estimate-card" style="display:none;">
+          <div class="estimate-items" id="estimate-items"></div>
+          <div class="qty-row">
+            <label>Quantity (g)</label>
+            <input type="number" id="qty-input" min="1" value="100">
+          </div>
+          <div class="cal-edit-row">
+            <input type="number" id="cal-input" min="0">
+            <span>calories — edit if needed</span>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="primary-btn" id="save-meal-btn">Log this meal</button>
+            <button class="ghost-btn" id="cancel-meal-btn">Cancel</button>
+          </div>
+        </div>
+
+        <div class="section-label">Today's meals</div>
+        <div class="entry-list" id="meals-list"></div>
+        <div class="status-line" id="meal-status"></div>
+      </div>
+
+      <div class="panel" id="panel-workouts">
+        <div class="coach-card" id="coach-card">
+          <div class="coach-avatar">C</div>
+          <div class="coach-text">
+            <div class="coach-label">Coach</div>
+            <div class="coach-msg" id="coach-msg">Log a session to get started.</div>
+          </div>
+        </div>
+
+        <div class="figure-row">
+          <div class="figure workout"><div class="l">Exercises today</div><div class="v" id="wo-count">0</div></div>
+          <div class="figure workout"><div class="l">Total sets</div><div class="v" id="wo-sets">0</div></div>
+        </div>
+
+        <div class="section-label">Routines</div>
+        <div class="routine-row" id="routine-row"></div>
+        <div class="new-routine-form" id="new-routine-form">
+          <input type="text" id="routine-name" placeholder="Routine name — e.g. Push day">
+          <input type="text" id="routine-exercises" placeholder="Exercises, comma separated">
+          <div style="display:flex;gap:10px;">
+            <button class="primary-btn" id="save-routine-btn">Save routine</button>
+            <button class="ghost-btn" id="cancel-routine-btn">Cancel</button>
+          </div>
+        </div>
+
+        <div class="section-label">Log an exercise</div>
+        <form class="w-form" id="w-form">
+          <input type="text" id="w-exercise" placeholder="Exercise" required autocomplete="off">
+          <input type="number" id="w-sets" placeholder="Sets" min="0">
+          <input type="number" id="w-reps" placeholder="Reps" min="0">
+          <input type="number" id="w-weight" placeholder="Weight">
+        </form>
+        <div class="exercise-suggestions" id="exercise-suggestions"></div>
+        <button class="primary-btn" id="add-wo-btn" style="margin-bottom:20px;">Add to log</button>
+
+        <div class="section-label">Today's session</div>
+        <div class="entry-list" id="workouts-list"></div>
+        <div class="status-line" id="wo-status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var MEALS_KEY = 'health:meals';
+  var WORKOUTS_KEY = 'health:workouts';
+  var ROUTINES_KEY = 'health:routines';
+  var CUSTOM_FOODS_KEY = 'health:customFoods';
+
+  // Built-in reference table: approximate kcal per 100g, common foods.
+  var FOOD_DB = [
+    ['Apple',52],['Banana',89],['Orange',47],['Grapes',69],['Strawberries',32],['Blueberries',57],
+    ['Watermelon',30],['Mango',60],['Pineapple',50],['Avocado',160],['Pear',57],['Peach',39],
+    ['Broccoli',34],['Spinach',23],['Carrot',41],['Sweet potato',86],['Potato, baked',93],['Tomato',18],
+    ['Cucumber',15],['Bell pepper',31],['Onion',40],['Mushrooms',22],['Zucchini',17],['Corn',86],
+    ['Chicken breast, grilled',165],['Chicken thigh',209],['Ground beef, 80/20',254],['Steak, sirloin',206],
+    ['Pork chop',231],['Bacon',541],['Salmon, cooked',208],['Tuna, canned in water',116],['Shrimp',99],
+    ['Egg, whole',155],['Egg white',52],['Tofu',76],['Turkey breast',135],['Ham',145],
+    ['White rice, cooked',130],['Brown rice, cooked',123],['Pasta, cooked',131],['Bread, white',265],
+    ['Bread, whole wheat',247],['Oatmeal, cooked',71],['Quinoa, cooked',120],['Bagel',250],['Tortilla, flour',312],
+    ['Cheddar cheese',403],['Mozzarella cheese',280],['Cream cheese',342],['Butter',717],['Milk, whole',61],
+    ['Milk, skim',34],['Greek yogurt, plain',59],['Yogurt, plain',61],['Almond milk, unsweetened',13],
+    ['Almonds',579],['Peanuts',567],['Peanut butter',588],['Walnuts',654],['Cashews',553],
+    ['Olive oil',884],['Honey',304],['Sugar, white',387],['Maple syrup',260],
+    ['Pizza, cheese, slice',266],['Hamburger, fast food',295],['Cheeseburger, fast food',303],
+    ['French fries',312],['Hot dog',290],['Fried chicken',246],['Sushi roll, avg',150],
+    ['Chocolate, milk',535],['Chocolate, dark',598],['Ice cream, vanilla',207],['Potato chips',536],
+    ['Popcorn, air-popped',387],['Pretzels',380],['Granola bar',471],['Donut',452],['Croissant',406],
+    ['Pancakes',227],['Waffle',291],['French toast',229],['Cereal, corn flakes',357],
+    ['Black beans, cooked',132],['Chickpeas, cooked',164],['Lentils, cooked',116],['Hummus',166],
+    ['Guacamole',150],['Salsa',36],['Ketchup',101],['Mayonnaise',680],['Mustard',66],
+    ['Coffee, black',2],['Tea, unsweetened',1],['Orange juice',45],['Soda, cola',42],
+    ['Beer',43],['Wine, red',85],['Protein shake, whey',110],['Almond butter',614],
+    ['Salad, garden, no dressing',20],['Caesar salad with dressing',190],['Soup, chicken noodle',38],
+    ['Ramen, instant',436],['Sushi, salmon nigiri, piece',48],['Burrito, chicken',210],
+    ['Taco, beef',226],['Nachos with cheese',346],['Falafel',333],['Edamame',122],
+    ['Cottage cheese',98],['Protein bar',350],['Trail mix',462],['Dried fruit, mixed',359],
+
+    // Nigerian dishes, snacks & drinks (approx. kcal per 100g)
+    ['Jollof rice',180],['Fried rice, Nigerian',185],['Coconut rice',200],['Ofada rice',170],
+    ['Ayamase (ofada stew)',200],['Native rice',175],
+    ['Pounded yam',120],['Eba (garri swallow)',160],['Amala',130],['Semovita',140],['Tuwo shinkafa',110],
+    ['Garri, soaked',110],['Garri, dry',360],
+    ['Egusi soup',230],['Efo riro',110],['Okra soup',90],['Ogbono soup',150],['Nsala soup (white soup)',140],
+    ['Banga soup',200],['Groundnut soup',250],['Vegetable soup, Nigerian',100],['Bitterleaf soup',105],
+    ['Moin moin',180],['Akara',300],['Suya (beef)',250],['Kilishi',400],
+    ['Pepper soup, goat meat',120],['Catfish pepper soup',100],['Peppered snail',110],
+    ['Fried plantain (dodo)',215],['Boiled plantain',122],['Roasted plantain (boli)',130],
+    ['Yam porridge (asaro)',140],['Beans porridge (ewa riro)',135],['Ewa agoyin',160],['Boiled yam',118],
+    ['Chin chin',450],['Puff puff',300],['Meat pie, Nigerian',320],['Sausage roll',330],['Small chops, mixed',300],
+    ['Nkwobi',250],['Isi ewu',230],['Ugba',250],['Abacha (African salad)',180],
+    ['Buka stew (obe ata)',180],['Gizzard, fried',215],['Roasted corn',130],
+    ['Zobo drink',40],['Chapman',45],['Kunu',55],['Fura da nono',90],['Palm wine',40],
+    ['Malt drink',50],['Pap/akamu (ogi)',55],
+  ];
+
+  var EXERCISE_DB = [
+    'Barbell bench press','Incline bench press','Dumbbell bench press','Push-up','Chest fly','Cable crossover','Dips',
+    'Pull-up','Chin-up','Lat pulldown','Barbell row','Dumbbell row','Seated cable row','Deadlift','T-bar row',
+    'Overhead press','Dumbbell shoulder press','Arnold press','Lateral raise','Front raise','Face pull','Shrugs',
+    'Barbell curl','Dumbbell curl','Hammer curl','Preacher curl','Tricep pushdown','Overhead tricep extension','Skull crusher',
+    'Squat','Front squat','Leg press','Lunges','Bulgarian split squat','Leg extension','Leg curl','Romanian deadlift',
+    'Calf raise','Hip thrust','Glute bridge',
+    'Plank','Sit-up','Crunch','Russian twist','Hanging leg raise','Mountain climbers','Cable woodchopper','Ab wheel rollout',
+    'Running','Treadmill walk','Jump rope','Rowing machine','Cycling','Stair climber','Burpees','Jumping jacks',
+    'Kettlebell swing','Clean and jerk','Snatch','Power clean','Farmer\'s carry','Battle ropes','Box jumps',
+    'Yoga','Stretching','Foam rolling'
+  ];
+
+  var meals = [];
+  var workouts = [];
+  var routines = [];
+  var customFoods = [];
+  var lastResults = [];
+  var selectedProduct = null;
+
+  var todayStr = new Date().toISOString().slice(0,10);
+  var now = new Date();
+  document.getElementById('today-label').textContent = now.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'});
+  document.getElementById('seal-day').textContent = now.getDate();
+
+  function setStatus(el, msg){
+    el.textContent = msg || '';
+    if(msg){ setTimeout(function(){ if(el.textContent===msg) el.textContent=''; }, 2500); }
+  }
+
+  document.querySelectorAll('.tab-flag').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-flag').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  async function loadAll(){
+    try{
+      var m = await window.storage.get(MEALS_KEY, false);
+      meals = m && m.value ? JSON.parse(m.value) : [];
+    }catch(e){ meals = []; }
+    try{
+      var w = await window.storage.get(WORKOUTS_KEY, false);
+      workouts = w && w.value ? JSON.parse(w.value) : [];
+    }catch(e){ workouts = []; }
+    try{
+      var r = await window.storage.get(ROUTINES_KEY, false);
+      routines = r && r.value ? JSON.parse(r.value) : [];
+    }catch(e){ routines = []; }
+    try{
+      var c = await window.storage.get(CUSTOM_FOODS_KEY, false);
+      customFoods = c && c.value ? JSON.parse(c.value) : [];
+    }catch(e){ customFoods = []; }
+    renderMeals();
+    renderWorkouts();
+    renderRoutines();
+    renderCoach();
+  }
+
+  async function saveMeals(){ try{ await window.storage.set(MEALS_KEY, JSON.stringify(meals), false); }catch(e){} }
+  async function saveWorkouts(){ try{ await window.storage.set(WORKOUTS_KEY, JSON.stringify(workouts), false); }catch(e){} }
+  async function saveRoutines(){ try{ await window.storage.set(ROUTINES_KEY, JSON.stringify(routines), false); }catch(e){} }
+  async function saveCustomFoods(){ try{ await window.storage.set(CUSTOM_FOODS_KEY, JSON.stringify(customFoods), false); }catch(e){} }
+
+  function todaysMeals(){ return meals.filter(function(m){ return m.date === todayStr; }); }
+  function todaysWorkouts(){ return workouts.filter(function(w){ return w.date === todayStr; }); }
+
+  function renderMeals(){
+    var list = document.getElementById('meals-list');
+    var today = todaysMeals().slice().sort(function(a,b){ return b.createdAt - a.createdAt; });
+    var total = today.reduce(function(s,m){ return s + m.calories; }, 0);
+    document.getElementById('cal-total').textContent = total;
+    document.getElementById('meal-count').textContent = today.length;
+    if(today.length === 0){
+      list.innerHTML = '<div class="empty-msg">No meals logged yet today.</div>';
+      return;
+    }
+    list.innerHTML = today.map(function(m){
+      return '<div class="entry-item meal" data-id="' + m.id + '">' +
+        '<div class="dot"></div>' +
+        '<div class="desc" title="' + escapeHtml(m.description) + '">' + escapeHtml(m.description) + '</div>' +
+        '<div class="cal">' + m.calories + ' cal</div>' +
+        '<button class="del" data-id="' + m.id + '" aria-label="Remove meal">&times;</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderWorkouts(){
+    var list = document.getElementById('workouts-list');
+    var today = todaysWorkouts().slice().sort(function(a,b){ return b.createdAt - a.createdAt; });
+    document.getElementById('wo-count').textContent = today.length;
+    document.getElementById('wo-sets').textContent = today.reduce(function(s,w){ return s + (w.sets||0); }, 0);
+    if(today.length === 0){
+      list.innerHTML = '<div class="empty-msg">No exercises logged yet today.</div>';
+      return;
+    }
+    list.innerHTML = today.map(function(w){
+      var detail = [];
+      if(w.sets) detail.push(w.sets + ' sets');
+      if(w.reps) detail.push(w.reps + ' reps');
+      if(w.weight) detail.push(w.weight + ' lb');
+      return '<div class="entry-item workout" data-id="' + w.id + '">' +
+        '<div class="dot"></div>' +
+        '<div class="desc">' + escapeHtml(w.exercise) + '</div>' +
+        '<div class="meta">' + detail.join(' · ') + '</div>' +
+        '<button class="del" data-id="' + w.id + '" aria-label="Remove exercise">&times;</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderRoutines(){
+    var row = document.getElementById('routine-row');
+    var chips = routines.map(function(r){
+      return '<button class="routine-chip" data-id="' + r.id + '">' + escapeHtml(r.name) + '</button>';
+    }).join('');
+    row.innerHTML = chips + '<button class="routine-chip add-new" id="add-routine-chip">+ New routine</button>';
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  document.getElementById('meals-list').addEventListener('click', function(e){
+    var btn = e.target.closest('.del');
+    if(!btn) return;
+    meals = meals.filter(function(m){ return String(m.id) !== btn.dataset.id; });
+    renderMeals();
+    saveMeals();
+    setStatus(document.getElementById('meal-status'), 'Meal removed');
+  });
+
+  document.getElementById('workouts-list').addEventListener('click', function(e){
+    var btn = e.target.closest('.del');
+    if(!btn) return;
+    workouts = workouts.filter(function(w){ return String(w.id) !== btn.dataset.id; });
+    renderWorkouts();
+    saveWorkouts();
+    renderCoach();
+    setStatus(document.getElementById('wo-status'), 'Exercise removed');
+  });
+
+  document.getElementById('routine-row').addEventListener('click', function(e){
+    var addBtn = e.target.closest('#add-routine-chip');
+    if(addBtn){
+      document.getElementById('new-routine-form').classList.add('show');
+      return;
+    }
+    var chip = e.target.closest('.routine-chip');
+    if(!chip) return;
+    var routine = routines.find(function(r){ return String(r.id) === chip.dataset.id; });
+    if(!routine) return;
+    routine.exercises.forEach(function(name){
+      workouts.push({
+        id: Date.now() + '-' + Math.random().toString(36).slice(2,6),
+        date: todayStr,
+        exercise: name,
+        sets: null, reps: null, weight: null,
+        createdAt: Date.now()
+      });
+    });
+    renderWorkouts();
+    saveWorkouts();
+    renderCoach();
+    setStatus(document.getElementById('wo-status'), 'Added "' + routine.name + '" exercises to today\'s log');
+  });
+
+  document.getElementById('save-routine-btn').addEventListener('click', function(){
+    var name = document.getElementById('routine-name').value.trim();
+    var exStr = document.getElementById('routine-exercises').value.trim();
+    if(!name || !exStr){ setStatus(document.getElementById('wo-status'), 'Enter a name and at least one exercise'); return; }
+    var exercises = exStr.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+    routines.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2,6), name: name, exercises: exercises });
+    saveRoutines();
+    renderRoutines();
+    document.getElementById('routine-name').value = '';
+    document.getElementById('routine-exercises').value = '';
+    document.getElementById('new-routine-form').classList.remove('show');
+    setStatus(document.getElementById('wo-status'), 'Routine saved');
+  });
+
+  document.getElementById('cancel-routine-btn').addEventListener('click', function(){
+    document.getElementById('new-routine-form').classList.remove('show');
+  });
+
+  document.getElementById('w-exercise').addEventListener('input', function(){
+    var q = this.value.trim().toLowerCase();
+    var box = document.getElementById('exercise-suggestions');
+    if(q.length < 2){ box.innerHTML = ''; return; }
+    var used = {};
+    workouts.forEach(function(w){ used[w.exercise] = true; });
+    routines.forEach(function(r){ r.exercises.forEach(function(e){ used[e] = true; }); });
+    var pool = EXERCISE_DB.concat(Object.keys(used));
+    var seen = {};
+    var matches = pool.filter(function(name){
+      var key = name.toLowerCase();
+      if(seen[key]) return false;
+      seen[key] = true;
+      return key.indexOf(q) !== -1;
+    });
+    matches.sort(function(a,b){
+      var aStarts = a.toLowerCase().indexOf(q) === 0 ? 0 : 1;
+      var bStarts = b.toLowerCase().indexOf(q) === 0 ? 0 : 1;
+      if(aStarts !== bStarts) return aStarts - bStarts;
+      return a.localeCompare(b);
+    });
+    box.innerHTML = matches.slice(0, 8).map(function(name){
+      return '<span class="sugg-item">' + escapeHtml(name) + '</span>';
+    }).join('');
+  });
+
+  document.getElementById('exercise-suggestions').addEventListener('click', function(e){
+    var item = e.target.closest('.sugg-item');
+    if(!item) return;
+    document.getElementById('w-exercise').value = item.textContent;
+    document.getElementById('exercise-suggestions').innerHTML = '';
+    document.getElementById('w-sets').focus();
+  });
+
+  var COMMEND_LINES = [
+    'Nice one — that\'s in the books.',
+    'Logged. Solid work.',
+    'That\'s a rep in the bank.',
+    'Getting stronger, one entry at a time.',
+    'Good stuff — keep stacking sessions.',
+    'Locked in. On to the next.',
+    'That counts. Well done.'
+  ];
+
+  function computeWorkoutStats(){
+    var dateSet = {};
+    workouts.forEach(function(w){ dateSet[w.date] = true; });
+
+    var streak = 0;
+    var cursor = new Date(todayStr + 'T00:00:00');
+    while(dateSet[cursor.toISOString().slice(0,10)]){
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+
+    var weekCount = 0;
+    for(var i = 0; i < 7; i++){
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      if(dateSet[d.toISOString().slice(0,10)]) weekCount++;
+    }
+
+    var allDates = Object.keys(dateSet).sort();
+    var lastDate = allDates.length ? allDates[allDates.length - 1] : null;
+    var daysSinceLast = null;
+    if(lastDate){
+      var msPerDay = 24 * 60 * 60 * 1000;
+      daysSinceLast = Math.round((new Date(todayStr) - new Date(lastDate)) / msPerDay);
+    }
+
+    return { streak: streak, weekCount: weekCount, lastDate: lastDate, daysSinceLast: daysSinceLast, hasAny: allDates.length > 0 };
+  }
+
+  function renderCoach(justLogged){
+    var stats = computeWorkoutStats();
+    var msg;
+
+    if(!stats.hasAny){
+      msg = 'Log your first session below and I\'ll start tracking your consistency.';
+    } else if(justLogged){
+      if(stats.streak >= 7){
+        msg = stats.streak + ' days in a row — strong streak. Make sure a rest day is in there somewhere too.';
+      } else if(stats.streak >= 3){
+        msg = 'Day ' + stats.streak + ' in a row. Keep the streak alive.';
+      } else {
+        var lines = [
+          'Nice — that\'s on record for today.',
+          'Good session. Consistency beats intensity over time.',
+          'Logged. Show up again tomorrow if you can.'
+        ];
+        msg = lines[Math.floor(Math.random() * lines.length)];
+      }
+    } else if(stats.daysSinceLast >= 5){
+      msg = 'It\'s been ' + stats.daysSinceLast + ' days since your last logged session. No pressure — just pick it back up when you\'re ready.';
+    } else if(stats.streak === 0 && stats.daysSinceLast >= 2){
+      msg = stats.daysSinceLast + ' days since your last session — a short one today still counts.';
+    } else if(stats.weekCount === 0){
+      msg = 'Nothing logged this week yet. What are you training today?';
+    } else if(stats.streak >= 7){
+      msg = 'You\'ve logged every day this week. Good work — don\'t skip recovery if your body\'s asking for it.';
+    } else {
+      msg = stats.weekCount + ' session' + (stats.weekCount === 1 ? '' : 's') + ' logged this week so far.';
+    }
+
+    document.getElementById('coach-msg').textContent = msg;
+  }
+
+  document.getElementById('add-wo-btn').addEventListener('click', function(){
+    var exercise = document.getElementById('w-exercise').value.trim();
+    var sets = parseInt(document.getElementById('w-sets').value, 10);
+    var reps = parseInt(document.getElementById('w-reps').value, 10);
+    var weight = parseFloat(document.getElementById('w-weight').value);
+    if(!exercise){ setStatus(document.getElementById('wo-status'), 'Enter an exercise name'); return; }
+    workouts.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2,6),
+      date: todayStr,
+      exercise: exercise,
+      sets: isNaN(sets) ? null : sets,
+      reps: isNaN(reps) ? null : reps,
+      weight: isNaN(weight) ? null : weight,
+      createdAt: Date.now()
+    });
+    renderWorkouts();
+    saveWorkouts();
+    renderCoach(true);
+    document.getElementById('w-exercise').value = '';
+    document.getElementById('w-sets').value = '';
+    document.getElementById('w-reps').value = '';
+    document.getElementById('w-weight').value = '';
+    document.getElementById('exercise-suggestions').innerHTML = '';
+    var commend = COMMEND_LINES[Math.floor(Math.random() * COMMEND_LINES.length)];
+    setStatus(document.getElementById('wo-status'), commend);
+  });
+
+  document.getElementById('food-search-btn').addEventListener('click', searchFood);
+  document.getElementById('food-search-input').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); searchFood(); }
+  });
+  document.getElementById('food-search-input').addEventListener('input', function(){
+    if(this.value.trim().length >= 2){ searchFood(); }
+  });
+
+  function searchFood(){
+    var query = document.getElementById('food-search-input').value.trim();
+    var estCard = document.getElementById('estimate-card');
+    var errBox = document.getElementById('analyze-error');
+    var resultsBox = document.getElementById('search-results');
+    estCard.style.display = 'none';
+    errBox.style.display = 'none';
+    resultsBox.innerHTML = '';
+    if(!query){ return; }
+
+    var q = query.toLowerCase();
+    var combined = customFoods.concat(FOOD_DB.map(function(f){ return { name: f[0], kcal100g: f[1] }; }));
+    var matches = combined.filter(function(f){ return f.name.toLowerCase().indexOf(q) !== -1; });
+    matches.sort(function(a,b){
+      var aStarts = a.name.toLowerCase().indexOf(q) === 0 ? 0 : 1;
+      var bStarts = b.name.toLowerCase().indexOf(q) === 0 ? 0 : 1;
+      if(aStarts !== bStarts) return aStarts - bStarts;
+      return a.name.localeCompare(b.name);
+    });
+    lastResults = matches.slice(0, 8);
+
+    if(lastResults.length === 0){
+      resultsBox.innerHTML =
+        '<div class="add-custom">' +
+          '<div class="hint">No match for "' + escapeHtml(query) + '" — add it with its calories per 100g, and it\'ll be remembered next time.</div>' +
+          '<div class="add-custom-row">' +
+            '<label>kcal / 100g</label>' +
+            '<input type="number" id="custom-kcal-input" min="0" placeholder="e.g. 150">' +
+            '<button class="ghost-btn" id="save-custom-food-btn">Add food</button>' +
+          '</div>' +
+        '</div>';
+      var saveCustomBtn = document.getElementById('save-custom-food-btn');
+      if(saveCustomBtn){
+        saveCustomBtn.addEventListener('click', function(){
+          var kcal = parseFloat(document.getElementById('custom-kcal-input').value);
+          if(isNaN(kcal) || kcal < 0){ setStatus(document.getElementById('meal-status'), 'Enter calories per 100g'); return; }
+          var newFood = { name: query, kcal100g: kcal };
+          customFoods.push(newFood);
+          saveCustomFoods();
+          selectedProduct = newFood;
+          document.getElementById('estimate-items').textContent = newFood.name;
+          document.getElementById('qty-input').value = 100;
+          document.getElementById('cal-input').value = Math.round(kcal);
+          resultsBox.innerHTML = '';
+          estCard.style.display = 'block';
+        });
+      }
+      return;
+    }
+
+    resultsBox.innerHTML = lastResults.map(function(f, i){
+      return '<button class="result-item" data-idx="' + i + '">' +
+        '<span class="r-name">' + escapeHtml(f.name) + '</span>' +
+        '<span class="r-kcal">' + Math.round(f.kcal100g) + ' kcal/100g</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  document.getElementById('search-results').addEventListener('click', function(e){
+    var btn = e.target.closest('.result-item');
+    if(!btn) return;
+    var idx = parseInt(btn.dataset.idx, 10);
+    var f = lastResults[idx];
+    if(!f) return;
+    selectedProduct = f;
+    document.getElementById('estimate-items').textContent = f.name;
+    document.getElementById('qty-input').value = 100;
+    document.getElementById('cal-input').value = Math.round(f.kcal100g);
+    document.getElementById('estimate-card').style.display = 'block';
+  });
+
+  document.getElementById('qty-input').addEventListener('input', function(){
+    if(!selectedProduct) return;
+    var qty = parseFloat(this.value) || 0;
+    document.getElementById('cal-input').value = Math.round(selectedProduct.kcal100g / 100 * qty);
+  });
+
+  document.getElementById('save-meal-btn').addEventListener('click', function(){
+    var cal = parseInt(document.getElementById('cal-input').value, 10);
+    if(isNaN(cal) || cal < 0){ setStatus(document.getElementById('meal-status'), 'Enter a calorie value'); return; }
+    var qty = document.getElementById('qty-input').value;
+    var baseDesc = document.getElementById('estimate-items').textContent;
+    var desc = selectedProduct ? baseDesc + ' (' + qty + 'g)' : baseDesc;
+    meals.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2,6),
+      date: todayStr,
+      description: desc,
+      calories: cal,
+      createdAt: Date.now()
+    });
+    renderMeals();
+    saveMeals();
+    resetSearchUI();
+    setStatus(document.getElementById('meal-status'), 'Meal logged');
+  });
+
+  document.getElementById('cancel-meal-btn').addEventListener('click', resetSearchUI);
+
+  function resetSearchUI(){
+    document.getElementById('estimate-card').style.display = 'none';
+    document.getElementById('search-results').innerHTML = '';
+    document.getElementById('food-search-input').value = '';
+    selectedProduct = null;
+    lastResults = [];
+  }
+
+  loadAll();
+})();
+</script>
